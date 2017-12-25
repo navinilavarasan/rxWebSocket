@@ -188,13 +188,7 @@ public class RxWebsocket {
     public <T> Single<QueuedMessage> send(final T message) {
         return eventStream()
                 .subscribeOn(Schedulers.io())
-                .doOnSubscribe(d -> {
-                    try {
-                        doQueueMessage(message);
-                    } catch (Throwable throwable) {
-                        eventStream.onError(throwable);
-                    }
-                })
+                .doOnSubscribe(d -> doQueueMessage(message))
                 .ofType(QueuedMessage.class)
                 .firstOrError();
     }
@@ -213,8 +207,9 @@ public class RxWebsocket {
 
     private void doConnect() {
         if (originalWebsocket != null) {
-            eventStream
-                    .onNext(new Open());
+            if (eventStream.hasSubscribers()) {
+                eventStream.onNext(new Open());
+            }
             return;
         }
 
@@ -226,7 +221,9 @@ public class RxWebsocket {
         requireNotNull(originalWebsocket, "Expected an open websocket");
         userRequestedClose = true;
         if (originalWebsocket != null) {
-            originalWebsocket.close(code, reason);
+            if (eventStream.hasSubscribers()) {
+                originalWebsocket.close(code, reason);
+            }
         }
     }
 
@@ -234,22 +231,32 @@ public class RxWebsocket {
         requireNotNull(originalWebsocket, "Expected an open websocket");
         requireNotNull(message, "Expected a non null message");
         if (originalWebsocket.send(ByteString.of(message))) {
-            eventStream.onNext(new QueuedMessage(ByteString.of(message)));
+            if (eventStream.hasSubscribers()) {
+                eventStream.onNext(new QueuedMessage(ByteString.of(message)));
+            }
         }
     }
 
-    private <T> void doQueueMessage(T message) throws Throwable {
+    private <T> void doQueueMessage(T message) throws Exception {
         requireNotNull(originalWebsocket, "Expected an open websocket");
         requireNotNull(message, "Expected a non null message");
 
         WebSocketConverter<T, String> converter = requestConverter(message.getClass());
         if (converter != null) {
-            if (originalWebsocket.send(converter.convert(message))) {
-                eventStream.onNext(new QueuedMessage(message));
+            try {
+                if (originalWebsocket.send(converter.convert(message))) {
+                    if (eventStream.hasSubscribers()) {
+                        eventStream.onNext(new QueuedMessage(message));
+                    }
+                }
+            } catch (Throwable throwable) {
+                throw new Exception(throwable);
             }
         } else if (message instanceof String) {
             if (originalWebsocket.send((String) message)) {
-                eventStream.onNext(new QueuedMessage(message));
+                if (eventStream.hasSubscribers()) {
+                    eventStream.onNext(new QueuedMessage(message));
+                }
             }
         }
     }
@@ -265,30 +272,39 @@ public class RxWebsocket {
             @Override
             public void onOpen(WebSocket webSocket, Response response) {
                 super.onOpen(webSocket, response);
-                eventStream.onNext(new Open(response));
+                if (eventStream.hasSubscribers()) {
+                    eventStream.onNext(new Open(response));
+                }
                 setClient(webSocket);
             }
 
             @Override
             public void onMessage(WebSocket webSocket, String message) {
                 super.onMessage(webSocket, message);
-                eventStream.onNext(new Message(message));
+                if (eventStream.hasSubscribers()) {
+                    eventStream.onNext(new Message(message));
+                }
             }
 
             @Override
             public void onMessage(WebSocket webSocket, ByteString messageBytes) {
                 super.onMessage(webSocket, messageBytes);
-                eventStream.onNext(new Message(messageBytes));
+                if (eventStream.hasSubscribers()) {
+                    eventStream.onNext(new Message(messageBytes));
+                }
             }
 
             @Override
             public void onClosed(WebSocket webSocket, int code, String reason) {
                 super.onClosed(webSocket, code, reason);
                 if (userRequestedClose) {
-                    eventStream.onNext(new Closed(code, reason));
-                    eventStream.onComplete();
+                    if (eventStream.hasSubscribers()) {
+                        eventStream.onNext(new Closed(code, reason));
+                    }
                 } else {
-                    eventStream.onError(new Closed(code, reason));
+                    if (eventStream.hasSubscribers()) {
+                        eventStream.onError(new Closed(code, reason));
+                    }
                 }
                 setClient(null);
             }
@@ -296,7 +312,10 @@ public class RxWebsocket {
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
                 super.onFailure(webSocket, t, response);
-                eventStream.onError(t);
+                if (eventStream.hasSubscribers()) {
+                    eventStream.onError(t);
+                    eventStream.onComplete();
+                }
                 setClient(null);
             }
         };
