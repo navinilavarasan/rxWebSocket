@@ -13,16 +13,17 @@ websocket = new RxWebsocket.Builder()
 <b> To Create a WebSocket with convertors:</b>
 ```
 websocket = new RxWebsocket.Builder()
-                .addConverterFactory(YOUR OWN CONVERTOR)
+                .addConverterFactory(//YOUR OWN CONVERTOR)
+		.addReceiveInterceptor(data -> //Intercept the received data)
                 .build("wss://echo.websocket.org");
 ```
 		
 <b> To Connect to the websocket:</b>
 ```
 websocket.connect()
-          .observeOn(AndroidSchedulers.mainThread())
-          .subscribe(
-	  	event -> Log.d(LOG_TAG, event.toString()),
+         .observeOn(AndroidSchedulers.mainThread())
+         .subscribe(
+	  	this::logEvent,
                 this::logError
 	   );
 ```
@@ -33,7 +34,7 @@ websocket.connect()
          .flatMap(open -> open.client().send("Hello"))
          .observeOn(AndroidSchedulers.mainThread())
          .subscribe(
-         	event -> Log.d(LOG_TAG, event.toString()),
+         	this::logEvent,
                 this::logError
 	  );
 ```
@@ -44,7 +45,7 @@ websocket.connect()
          .flatMapPublisher(open -> open.client().listen())
          .observeOn(AndroidSchedulers.mainThread())
          .subscribe(
-         	event -> Log.d(LOG_TAG, event.toString()),
+         	this::logEvent,
                 this::logError
 	  );
 ```
