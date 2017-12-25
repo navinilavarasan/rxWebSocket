@@ -221,9 +221,7 @@ public class RxWebsocket {
         requireNotNull(originalWebsocket, "Expected an open websocket");
         userRequestedClose = true;
         if (originalWebsocket != null) {
-            if (eventStream.hasSubscribers()) {
-                originalWebsocket.close(code, reason);
-            }
+            originalWebsocket.close(code, reason);
         }
     }
 
