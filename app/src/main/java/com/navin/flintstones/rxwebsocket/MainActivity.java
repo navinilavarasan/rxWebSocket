@@ -41,7 +41,9 @@ public class MainActivity extends Activity {
     }
 
     private void openWebsocket() {
-        websocket = new RxWebsocket.Builder().build(location.getText().toString());
+        websocket = new RxWebsocket.Builder()
+                .addConverterFactory(WebSocketConverterFactory.create())
+                .build(location.getText().toString());
         logEvents();
     }
 
@@ -51,15 +53,30 @@ public class MainActivity extends Activity {
                 .doOnNext(event -> {
                     if (event instanceof RxWebsocket.Open) {
                         log("CONNECTED");
+                        logNewLine();
                     } else if (event instanceof RxWebsocket.Closed) {
                         log("DISCONNECTED");
+                        logNewLine();
                     } else if (event instanceof RxWebsocket.QueuedMessage) {
                         log("[MESSAGE QUEUED]:" + ((RxWebsocket.QueuedMessage) event).message().toString());
+                        logNewLine();
                     } else if (event instanceof RxWebsocket.Message) {
-                        log("[MESSAGE RECEIVED]:" + ((RxWebsocket.Message) event).message().toString());
+                        try {
+                            log("[DE-SERIALIZED MESSAGE RECEIVED]:" + ((RxWebsocket.Message) event).data(SampleDataModel.class).toString());
+                            log(String.format("[DE-SERIALIZED MESSAGE RECEIVED][id]:%d", ((RxWebsocket.Message) event).data(SampleDataModel.class).id()));
+                            log(String.format("[DE-SERIALIZED MESSAGE RECEIVED][message]:%s", ((RxWebsocket.Message) event).data(SampleDataModel.class).message()));
+                            logNewLine();
+                        } catch (Throwable throwable) {
+                            log("[MESSAGE RECEIVED]:" + ((RxWebsocket.Message) event).data().toString());
+                            logNewLine();
+                        }
                     }
                 })
                 .subscribe();
+    }
+
+    private void logNewLine() {
+        recdMessage.setText(recdMessage.getText() + "\n");
     }
 
 
@@ -109,6 +126,19 @@ public class MainActivity extends Activity {
                             this::logError);
         }
     }
+
+    @OnClick({R.id.send_sample_obj})
+    void onSendObject() {
+        if (websocket != null) {
+            websocket
+                    .send(new SampleDataModel(1, "sample object"))
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            event -> Log.d(MainActivity.class.getSimpleName(), event.toString()),
+                            this::logError);
+        }
+    }
+
 
     @OnClick({R.id.clear})
     void onClear() {

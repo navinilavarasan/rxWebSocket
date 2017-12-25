@@ -2,6 +2,7 @@ package com.navin.flintstones.rxwebsocket;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,13 +72,38 @@ public class RxWebsocket {
         }
 
         @Nullable
-        public String message() {
+        public String data() {
             return message;
         }
 
         @Nullable
-        public ByteString messageBytes() {
+        public ByteString dataBytes() {
             return messageBytes;
+        }
+
+        @NonNull
+        private String dataOrDataBytesAsString() {
+            if (data() == null && dataBytes() == null) {
+                return "";
+            }
+            if (dataBytes() == null) {
+                return data();
+            }
+
+            if (data() == null) {
+                return dataBytes() == null ? "" : dataBytes().utf8();
+            }
+
+            return "";
+        }
+
+        public <T> T data(Class<? extends T> type) throws Throwable {
+            WebSocketConverter<String, T> converter = responseConverter(type);
+            if (converter != null) {
+                return converter.convert(dataOrDataBytesAsString());
+            } else {
+                throw new Exception("No converters available to convert the enqueued object");
+            }
         }
 
         @Override
@@ -86,28 +112,17 @@ public class RxWebsocket {
         }
     }
 
-    public class QueuedMessage implements Event {
-        private final String message;
-        private final ByteString messageBytes;
+    public class QueuedMessage<T> implements Event {
+        private final T message;
 
-        public QueuedMessage(String message) {
+        public QueuedMessage(T message) {
             this.message = message;
-            this.messageBytes = null;
         }
 
-        public QueuedMessage(ByteString messageBytes) {
-            this.messageBytes = messageBytes;
-            this.message = null;
-        }
 
         @Nullable
-        public String message() {
+        public T message() {
             return message;
-        }
-
-        @Nullable
-        public ByteString messageBytes() {
-            return messageBytes;
         }
 
         @Override
@@ -162,18 +177,26 @@ public class RxWebsocket {
                 .ofType(Message.class);
     }
 
-    public Flowable<QueuedMessage> send(String message) {
+    public Single<QueuedMessage> send(byte[] message) {
         return eventStream()
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(d -> doQueueMessage(message))
-                .ofType(QueuedMessage.class);
+                .ofType(QueuedMessage.class)
+                .firstOrError();
     }
 
-    public Flowable<QueuedMessage> send(byte[] message) {
+    public <T> Single<QueuedMessage> send(final T message) {
         return eventStream()
                 .subscribeOn(Schedulers.io())
-                .doOnSubscribe(d -> doQueueMessage(message))
-                .ofType(QueuedMessage.class);
+                .doOnSubscribe(d -> {
+                    try {
+                        doQueueMessage(message);
+                    } catch (Throwable throwable) {
+                        eventStream.onError(throwable);
+                    }
+                })
+                .ofType(QueuedMessage.class)
+                .firstOrError();
     }
 
     public Single<Closed> disconnect(int code, String reason) {
@@ -181,7 +204,7 @@ public class RxWebsocket {
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(d -> doDisconnect(code, reason))
                 .ofType(Closed.class)
-                .singleOrError();
+                .firstOrError();
     }
 
     public Flowable<Event> eventStream() {
@@ -215,11 +238,19 @@ public class RxWebsocket {
         }
     }
 
-    private void doQueueMessage(String message) {
+    private <T> void doQueueMessage(T message) throws Throwable {
         requireNotNull(originalWebsocket, "Expected an open websocket");
         requireNotNull(message, "Expected a non null message");
-        if (originalWebsocket.send(message)) {
-            eventStream.onNext(new QueuedMessage(message));
+
+        WebSocketConverter<T, String> converter = requestConverter(message.getClass());
+        if (converter != null) {
+            if (originalWebsocket.send(converter.convert(message))) {
+                eventStream.onNext(new QueuedMessage(message));
+            }
+        } else if (message instanceof String) {
+            if (originalWebsocket.send((String) message)) {
+                eventStream.onNext(new QueuedMessage(message));
+            }
         }
     }
 
@@ -269,6 +300,28 @@ public class RxWebsocket {
                 setClient(null);
             }
         };
+    }
+
+    private <T> WebSocketConverter<String, T> responseConverter(final Type type) {
+        for (WebSocketConverter.Factory converterFactory : converterFactories) {
+            WebSocketConverter<String, ?> converter =
+                    converterFactory.responseBodyConverter(type);
+            if (converter != null) {
+                return (WebSocketConverter<String, T>) converter;
+            }
+        }
+        return null;
+    }
+
+    private <T> WebSocketConverter<T, String> requestConverter(final Type type) {
+        for (WebSocketConverter.Factory converterFactory : converterFactories) {
+            WebSocketConverter<?, String> converter =
+                    converterFactory.requestBodyConverter(type);
+            if (converter != null) {
+                return (WebSocketConverter<T, String>) converter;
+            }
+        }
+        return null;
     }
 
     private static <T> T requireNotNull(T object, String message) {

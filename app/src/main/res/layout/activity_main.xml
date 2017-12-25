@@ -73,6 +73,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Send" />
+
+        <Button
+            android:id="@+id/send_sample_obj"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send Object" />
     </LinearLayout>
 
     <RelativeLayout
