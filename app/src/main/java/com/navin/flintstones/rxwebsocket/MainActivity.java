@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
     private void openWebsocket() {
         websocket = new RxWebsocket.Builder()
                 .addConverterFactory(WebSocketConverterFactory.create())
+                .addReceiveInterceptor(data -> "INTERCEPTED:" + data)
                 .build(location.getText().toString());
         logEvents();
     }

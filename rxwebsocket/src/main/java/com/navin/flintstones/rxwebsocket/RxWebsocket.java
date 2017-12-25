@@ -73,7 +73,11 @@ public class RxWebsocket {
 
         @Nullable
         public String data() {
-            return message;
+            String interceptedMessage = message;
+            for (WebSocketInterceptor interceptor : receiveInterceptors) {
+                interceptedMessage = interceptor.intercept(interceptedMessage);
+            }
+            return interceptedMessage;
         }
 
         @Nullable
