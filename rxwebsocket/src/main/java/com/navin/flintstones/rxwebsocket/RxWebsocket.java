@@ -232,14 +232,18 @@ public class RxWebsocket {
         }
     }
 
-    private <T> void doQueueMessage(T message) throws Throwable {
+    private <T> void doQueueMessage(T message) {
         requireNotNull(originalWebsocket, "Expected an open websocket");
         requireNotNull(message, "Expected a non null message");
 
         WebSocketConverter<T, String> converter = requestConverter(message.getClass());
         if (converter != null) {
-            if (originalWebsocket.send(converter.convert(message))) {
-                eventStream.onNext(new QueuedMessage(message));
+            try {
+                if (originalWebsocket.send(converter.convert(message))) {
+                    eventStream.onNext(new QueuedMessage(message));
+                }
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
             }
         } else if (message instanceof String) {
             if (originalWebsocket.send((String) message)) {
