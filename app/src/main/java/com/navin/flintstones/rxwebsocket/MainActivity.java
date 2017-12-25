@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
     EditText sendMessage;
 
     @BindView(R.id.recd_message)
-    EditText recdMessage;
+    TextView recdMessage;
 
     private RxWebsocket websocket;
 
@@ -108,5 +108,10 @@ public class MainActivity extends Activity {
                             event -> Log.d(MainActivity.class.getSimpleName(), event.toString()),
                             this::logError);
         }
+    }
+
+    @OnClick({R.id.clear})
+    void onClear() {
+        recdMessage.setText("");
     }
 }

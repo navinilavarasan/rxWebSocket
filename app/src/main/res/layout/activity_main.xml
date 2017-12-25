@@ -27,8 +27,8 @@
                 android:id="@+id/location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="ws://echo.websocket.org"
-                android:text="ws://echo.websocket.org" />
+                android:hint="wss://echo.websocket.org"
+                android:text="wss://echo.websocket.org" />
         </LinearLayout>
 
         <LinearLayout
@@ -75,26 +75,43 @@
             android:text="Send" />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="24dp"
         android:orientation="vertical">
 
-        <TextView
+        <ScrollView
+            android:id="@+id/SCROLLER_ID"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/clear"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Log:" />
+
+                <TextView
+                    android:id="@+id/recd_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="top|left" />
+            </LinearLayout>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/clear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Message Received" />
-
-        <EditText
-            android:id="@+id/recd_message"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top|left"
-            android:inputType="textEmailAddress|textMultiLine"
-            android:lines="20"
-            android:minLines="5"
-            android:scrollHorizontally="false"
-            android:scrollbars="vertical" />
-    </LinearLayout>
+            android:layout_alignParentBottom="true"
+            android:layout_weight="2"
+            android:text="Clear" />
+    </RelativeLayout>
 </LinearLayout>
