@@ -5,6 +5,7 @@ rxWebSocket is a simple reactive extension of OkHttp3.5 Websocket interface with
 
 Step 1. Add the JitPack repository to your build file
 Add it in your root build.gradle at the end of repositories:
+
 	allprojects {
 		repositories {
 			...
