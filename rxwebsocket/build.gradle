@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 26
@@ -28,19 +27,11 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'org.jetbrains:annotations:15.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
-    api 'io.reactivex.rxjava2:rxjava:2.1.7'
-
-    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
-    compile 'org.jetbrains:annotations:15.0'
-    compile 'com.google.code.gson:gson:2.8.2'
-}
-
-retrolambda {
-    jvmArgs '-noverify'
 }
