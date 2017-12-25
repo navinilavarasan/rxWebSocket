@@ -68,5 +68,6 @@ Add it in your root build.gradle at the end of repositories:
 	        implementation 'com.github.navinilavarasan:rxWebSocket:v0.1'
 	}
 
-<b> PRE-RELEASE </b>
+
+<b> PRE-RELEASE </b><br>
 [![](https://jitpack.io/v/navinilavarasan/rxWebSocket.svg)](https://jitpack.io/#navinilavarasan/rxWebSocket)
