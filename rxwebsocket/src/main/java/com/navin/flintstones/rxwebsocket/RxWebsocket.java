@@ -127,12 +127,6 @@ public class RxWebsocket {
             this.reason = reason;
         }
 
-        public Closed(Throwable throwable) {
-            super(throwable);
-            this.code = INTERNAL_ERROR;
-            this.reason = throwable.getMessage();
-        }
-
         public int code() {
             return code;
         }
@@ -183,11 +177,6 @@ public class RxWebsocket {
     }
 
     public Single<Closed> disconnect(int code, String reason) {
-        if (eventStream == null || originalWebsocket == null) {
-            return Single
-                    .error(new Closed(new Throwable("Websocket is not open or already closed")));
-        }
-
         return eventStream()
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(d -> doDisconnect(code, reason))
@@ -211,6 +200,7 @@ public class RxWebsocket {
     }
 
     private void doDisconnect(int code, String reason) {
+        requireNotNull(originalWebsocket, "Expected an open websocket");
         userRequestedClose = true;
         if (originalWebsocket != null) {
             originalWebsocket.close(code, reason);
