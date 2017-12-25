@@ -10,7 +10,7 @@ websocket = new RxWebsocket.Builder()
                 .build("wss://echo.websocket.org");
 ```
 
-<b> To Create a WebSocket with convertors:</b>
+<b> To Create a WebSocket with convertors(See sample application to add a simple Gson convertor or write your own):</b>
 ```
 websocket = new RxWebsocket.Builder()
                 .addConverterFactory(//YOUR OWN CONVERTOR)
