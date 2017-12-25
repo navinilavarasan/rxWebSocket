@@ -188,13 +188,7 @@ public class RxWebsocket {
     public <T> Single<QueuedMessage> send(final T message) {
         return eventStream()
                 .subscribeOn(Schedulers.io())
-                .doOnSubscribe(d -> {
-                    try {
-                        doQueueMessage(message);
-                    } catch (Throwable throwable) {
-                        eventStream.onError(throwable);
-                    }
-                })
+                .doOnSubscribe(d -> doQueueMessage(message))
                 .ofType(QueuedMessage.class)
                 .firstOrError();
     }
@@ -296,7 +290,10 @@ public class RxWebsocket {
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
                 super.onFailure(webSocket, t, response);
-                eventStream.onError(t);
+                if (eventStream.hasSubscribers()) {
+                    eventStream.onError(t);
+                    eventStream.onComplete();
+                }
                 setClient(null);
             }
         };
