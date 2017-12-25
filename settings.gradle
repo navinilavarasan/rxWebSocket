@@ -1,1 +1,1 @@
-include ':app', ':rxwebsocket'
+include ':rxwebsocket', ':app'
