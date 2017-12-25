@@ -118,12 +118,19 @@ public class RxWebsocket {
 
 
     public class Closed extends Throwable implements Event {
+        public static final int INTERNAL_ERROR = 500;
         private final String reason;
         private final int code;
 
         public Closed(int code, String reason) {
             this.code = code;
             this.reason = reason;
+        }
+
+        public Closed(Throwable throwable) {
+            super(throwable);
+            this.code = INTERNAL_ERROR;
+            this.reason = throwable.getMessage();
         }
 
         public int code() {
@@ -148,11 +155,6 @@ public class RxWebsocket {
     private PublishProcessor<Event> eventStream = PublishProcessor.create();
 
     public Single<Open> connect() {
-        if (originalWebsocket != null) {
-            return Single
-                    .just(new Open())
-                    .subscribeOn(Schedulers.io());
-        }
         return eventStream()
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(d -> doConnect())
@@ -180,11 +182,17 @@ public class RxWebsocket {
                 .ofType(QueuedMessage.class);
     }
 
-    public Flowable<Closed> disconnect(int code, String reason) {
+    public Single<Closed> disconnect(int code, String reason) {
+        if (eventStream == null || originalWebsocket == null) {
+            return Single
+                    .error(new Closed(new Throwable("Websocket is not open or already closed")));
+        }
+
         return eventStream()
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(d -> doDisconnect(code, reason))
-                .ofType(Closed.class);
+                .ofType(Closed.class)
+                .singleOrError();
     }
 
     public Flowable<Event> eventStream() {
@@ -192,6 +200,12 @@ public class RxWebsocket {
     }
 
     private void doConnect() {
+        if (originalWebsocket != null) {
+            eventStream
+                    .onNext(new Open());
+            return;
+        }
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
         okHttpClient.newWebSocket(request, webSocketListener());
     }
