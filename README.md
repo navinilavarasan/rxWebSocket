@@ -69,5 +69,5 @@ Add it in your root build.gradle at the end of repositories:
 	}
 
 
-<b> PRE-RELEASE </b><br>
+<b> RELEASE </b><br>
 [![](https://jitpack.io/v/navinilavarasan/rxWebSocket.svg)](https://jitpack.io/#navinilavarasan/rxWebSocket)
