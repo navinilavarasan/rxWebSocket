@@ -66,7 +66,7 @@ Add it in your root build.gradle at the end of repositories:
 <b>Step 2. Add the dependency</b>
 
 	dependencies {
-	        implementation 'com.github.navinilavarasan:rxWebSocket:v1.0'
+	        implementation 'com.github.navinilavarasan:rxWebSocket:v1.01'
 	}
 
 
