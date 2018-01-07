@@ -1,4 +1,4 @@
-package com.navin.flintstones.rxwebsocket;
+package com.navin.flintstones.rxwebsocket_app;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.navin.flintstones.rxwebsocket.RxWebsocket;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

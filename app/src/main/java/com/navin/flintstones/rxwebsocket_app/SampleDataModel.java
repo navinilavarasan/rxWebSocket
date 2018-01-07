@@ -1,4 +1,4 @@
-package com.navin.flintstones.rxwebsocket;
+package com.navin.flintstones.rxwebsocket_app;
 
 import com.google.gson.annotations.SerializedName;
 
