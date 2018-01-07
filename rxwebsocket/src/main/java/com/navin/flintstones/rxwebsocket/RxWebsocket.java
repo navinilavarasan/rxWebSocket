@@ -31,7 +31,7 @@ public class RxWebsocket {
 
     private boolean userRequestedClose = false;
 
-    interface Event {
+    public interface Event {
         RxWebsocket client();
     }
 
