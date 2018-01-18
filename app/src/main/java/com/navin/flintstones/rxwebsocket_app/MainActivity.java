@@ -75,7 +75,8 @@ public class MainActivity extends Activity {
                         }
                     }
                 })
-                .subscribe();
+                .subscribe(event -> {
+                }, this::logError);
     }
 
     private void logNewLine() {
