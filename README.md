@@ -1,7 +1,6 @@
 # rxWebSocket
 
 rxWebSocket is a simple reactive extension of OkHttp Websocket interface with support for Convertor Factories and Interceptors.
-<br><i>The library contains only 3 files and is meant to be very simple.</i>
 
 # Usage
 
