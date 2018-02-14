@@ -274,10 +274,12 @@ public class RxWebsocket {
             @Override
             public void onOpen(WebSocket webSocket, Response response) {
                 super.onOpen(webSocket, response);
+
+                setClient(webSocket);
+
                 if (eventStream.hasSubscribers()) {
                     eventStream.onNext(new Open(response));
                 }
-                setClient(webSocket);
             }
 
             @Override
