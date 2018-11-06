@@ -30,142 +30,14 @@ public class RxWebsocket {
     private WebSocket originalWebsocket;
 
     private boolean userRequestedClose = false;
-
-    public interface Event {
-        RxWebsocket client();
-    }
-
-    public class Open implements Event {
-        private final Maybe<Response> response;
-
-        public Open(Response response) {
-            this.response = Maybe.just(response);
-        }
-
-        public Open() {
-            this.response = Maybe.empty();
-        }
-
-        @Nullable
-        public Response response() {
-            return response.blockingGet();
-        }
-
-        @Override
-        public RxWebsocket client() {
-            return RxWebsocket.this;
-        }
-    }
-
-    public class Message implements Event {
-        private final String message;
-        private final ByteString messageBytes;
-
-        public Message(String message) {
-            this.message = message;
-            this.messageBytes = null;
-        }
-
-        public Message(ByteString messageBytes) {
-            this.messageBytes = messageBytes;
-            this.message = null;
-        }
-
-        @Nullable
-        public String data() {
-            String interceptedMessage = message;
-            for (WebSocketInterceptor interceptor : receiveInterceptors) {
-                interceptedMessage = interceptor.intercept(interceptedMessage);
-            }
-            return interceptedMessage;
-        }
-
-        @Nullable
-        public ByteString dataBytes() {
-            return messageBytes;
-        }
-
-        @NonNull
-        private String dataOrDataBytesAsString() {
-            if (data() == null && dataBytes() == null) {
-                return "";
-            }
-            if (dataBytes() == null) {
-                return data();
-            }
-
-            if (data() == null) {
-                return dataBytes() == null ? "" : dataBytes().utf8();
-            }
-
-            return "";
-        }
-
-        public <T> T data(Class<? extends T> type) throws Throwable {
-            WebSocketConverter<String, T> converter = responseConverter(type);
-            if (converter != null) {
-                return converter.convert(dataOrDataBytesAsString());
-            } else {
-                throw new Exception("No converters available to convert the enqueued object");
-            }
-        }
-
-        @Override
-        public RxWebsocket client() {
-            return RxWebsocket.this;
-        }
-    }
-
-    public class QueuedMessage<T> implements Event {
-        private final T message;
-
-        public QueuedMessage(T message) {
-            this.message = message;
-        }
-
-
-        @Nullable
-        public T message() {
-            return message;
-        }
-
-        @Override
-        public RxWebsocket client() {
-            return RxWebsocket.this;
-        }
-    }
-
-
-    public class Closed extends Throwable implements Event {
-        public static final int INTERNAL_ERROR = 500;
-        private final String reason;
-        private final int code;
-
-        public Closed(int code, String reason) {
-            this.code = code;
-            this.reason = reason;
-        }
-
-        public int code() {
-            return code;
-        }
-
-        public String reason() {
-            return reason;
-        }
-
-        @Override
-        public String getMessage() {
-            return reason();
-        }
-
-        @Override
-        public RxWebsocket client() {
-            return RxWebsocket.this;
-        }
-    }
-
     private PublishProcessor<Event> eventStream = PublishProcessor.create();
+
+    private static <T> T requireNotNull(T object, String message) {
+        if (object == null) {
+            throw new IllegalStateException(message);
+        }
+        return object;
+    }
 
     public Single<Open> connect() {
         return eventStream()
@@ -347,11 +219,8 @@ public class RxWebsocket {
         return null;
     }
 
-    private static <T> T requireNotNull(T object, String message) {
-        if (object == null) {
-            throw new IllegalStateException(message);
-        }
-        return object;
+    public interface Event {
+        RxWebsocket client();
     }
 
     /**
@@ -408,6 +277,135 @@ public class RxWebsocket {
             rxWebsocket.receiveInterceptors = receiveInterceptors;
             rxWebsocket.request = request;
             return rxWebsocket;
+        }
+    }
+
+    public class Open implements Event {
+        private final Maybe<Response> response;
+
+        public Open(Response response) {
+            this.response = Maybe.just(response);
+        }
+
+        public Open() {
+            this.response = Maybe.empty();
+        }
+
+        @Nullable
+        public Response response() {
+            return response.blockingGet();
+        }
+
+        @Override
+        public RxWebsocket client() {
+            return RxWebsocket.this;
+        }
+    }
+
+    public class Message implements Event {
+        private final String message;
+        private final ByteString messageBytes;
+
+        public Message(String message) {
+            this.message = message;
+            this.messageBytes = null;
+        }
+
+        public Message(ByteString messageBytes) {
+            this.messageBytes = messageBytes;
+            this.message = null;
+        }
+
+        @Nullable
+        public String data() {
+            String interceptedMessage = message;
+            for (WebSocketInterceptor interceptor : receiveInterceptors) {
+                interceptedMessage = interceptor.intercept(interceptedMessage);
+            }
+            return interceptedMessage;
+        }
+
+        @Nullable
+        public ByteString dataBytes() {
+            return messageBytes;
+        }
+
+        @NonNull
+        private String dataOrDataBytesAsString() {
+            if (data() == null && dataBytes() == null) {
+                return "";
+            }
+            if (dataBytes() == null) {
+                return data();
+            }
+
+            if (data() == null) {
+                return dataBytes() == null ? "" : dataBytes().utf8();
+            }
+
+            return "";
+        }
+
+        public <T> T data(Class<? extends T> type) throws Throwable {
+            WebSocketConverter<String, T> converter = responseConverter(type);
+            if (converter != null) {
+                return converter.convert(dataOrDataBytesAsString());
+            } else {
+                throw new Exception("No converters available to convert the enqueued object");
+            }
+        }
+
+        @Override
+        public RxWebsocket client() {
+            return RxWebsocket.this;
+        }
+    }
+
+    public class QueuedMessage<T> implements Event {
+        private final T message;
+
+        public QueuedMessage(T message) {
+            this.message = message;
+        }
+
+
+        @Nullable
+        public T message() {
+            return message;
+        }
+
+        @Override
+        public RxWebsocket client() {
+            return RxWebsocket.this;
+        }
+    }
+
+    public class Closed extends Throwable implements Event {
+        public static final int INTERNAL_ERROR = 500;
+        private final String reason;
+        private final int code;
+
+        public Closed(int code, String reason) {
+            this.code = code;
+            this.reason = reason;
+        }
+
+        public int code() {
+            return code;
+        }
+
+        public String reason() {
+            return reason;
+        }
+
+        @Override
+        public String getMessage() {
+            return reason();
+        }
+
+        @Override
+        public RxWebsocket client() {
+            return RxWebsocket.this;
         }
     }
 }

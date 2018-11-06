@@ -8,19 +8,19 @@ import com.navin.flintstones.rxwebsocket.WebSocketConverter;
 import java.lang.reflect.Type;
 
 public final class WebSocketConverterFactory extends WebSocketConverter.Factory {
+    private final Gson gson;
+
+    private WebSocketConverterFactory(Gson gson) {
+        if (gson == null) throw new NullPointerException("gson == null");
+        this.gson = gson;
+    }
+
     public static WebSocketConverterFactory create() {
         return create(new Gson());
     }
 
     public static WebSocketConverterFactory create(Gson gson) {
         return new WebSocketConverterFactory(gson);
-    }
-
-    private final Gson gson;
-
-    private WebSocketConverterFactory(Gson gson) {
-        if (gson == null) throw new NullPointerException("gson == null");
-        this.gson = gson;
     }
 
     @Override
