@@ -19,6 +19,7 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
 
+@SuppressWarnings({"UnusedReturnValue", "WeakerAccess", "unused", "unchecked"})
 public class RxWebSocket {
 
     private Request request;
