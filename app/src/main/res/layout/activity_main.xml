@@ -7,7 +7,8 @@
     android:paddingLeft="12dp"
     android:paddingTop="24dp"
     android:paddingRight="12dp"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:ignore="RtlHardcoded">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,8 +28,10 @@
                 android:id="@+id/location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="ws://office.baltazzar.co:6969/live-contest"
-                android:text="ws://office.baltazzar.co:6969/live-contest" />
+                android:hint="wss://echo.websocket.org"
+                android:importantForAutofill="no"
+                android:inputType="textUri"
+                android:text="wss://echo.websocket.org" />
         </LinearLayout>
 
         <LinearLayout
@@ -66,7 +69,9 @@
             android:id="@+id/send_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter your text here" />
+            android:hint="Enter your text here"
+            android:importantForAutofill="no"
+            android:inputType="text" />
 
         <Button
             android:id="@+id/send"
@@ -95,8 +100,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/clear"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
@@ -117,7 +121,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_weight="2"
             android:text="Clear" />
     </RelativeLayout>
 </LinearLayout>
