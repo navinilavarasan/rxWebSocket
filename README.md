@@ -1,75 +1,62 @@
-rxWebSocket
-------------
+rxWebSocket [![](https://img.shields.io/badge/Android%20Arsenal-rxWebsocket-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/6630) [![Codacy Badge](https://api.codacy.com/project/badge/grade/e93c6273804a4dbc91a298a66fed99be)](https://www.codacy.com/app/aesshoferi/EasyIntro)
+===========
 rxWebSocket is a simple reactive extension of OkHttp Websocket interface with support for Converter Factories and Interceptors.
 
 ## Download
-<b>Step 1. Add the JitPack repository to your build file</b>
+**Step 1. Add the JitPack repository to your build file**
 Add it in your root build.gradle at the end of repositories:
 
-	allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
+```gradle
+allprojects {
+    repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+    }
+}
+```
 
-<b>Step 2. Add the dependency</b>
-
-	dependencies {
-	        implementation 'com.github.navinilavarasan:rxWebSocket:v1.02'
-	}
-
-
-<b> RELEASE </b><br>
-[![](https://jitpack.io/v/navinilavarasan/rxWebSocket.svg)](https://jitpack.io/#navinilavarasan/rxWebSocket)
-
-[![](https://img.shields.io/badge/Android%20Arsenal-rxWebsocket-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/6630)
-
+**Step 2. Add the dependency**
+```gradle
+dependencies {
+    implementation 'io.github.meness:rxWebSocket:v1.02'
+}
+```
 ## Usage
-<b> To Create a WebSocket with no converters: </b>
-```
+**To Create a WebSocket with no converters:**
+```java
 websocket = new RxWebsocket.Builder()
-                .build("wss://echo.websocket.org");
+            .build("wss://echo.websocket.org");
 ```
 
-<b> To Create a WebSocket with converters(See sample application to add a simple Gson converter or write your own):</b>
-```
+**To Create a WebSocket with converters(See sample application to add a simple Gson converter or write your own):**
+```java
 websocket = new RxWebsocket.Builder()
-                .addConverterFactory(//YOUR OWN CONVERTER)
-		.addReceiveInterceptor(data -> //Intercept the received data)
-                .build("wss://echo.websocket.org");
+            .addConverterFactory() //Your converter
+            .addReceiveInterceptor(data -> {}) //Intercept the received data
+            .build("wss://echo.websocket.org");
 ```
-		
-<b> To Connect to the websocket:</b>
-```
+
+**To Connect to the websocket:**
+```java
 websocket.connect()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(
-	  	this::logEvent,
-                this::logError
-	   );
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(this::logEvent, this::logError);
 ```
-	   
-<b> To Connect and Send data on a connected socket:</b>
-```
+
+**To Connect and Send data on a connected socket:**
+```java
 websocket.connect()
          .flatMap(open -> open.client().send("Hello"))
          .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(
-         	this::logEvent,
-                this::logError
-	  );
+         .subscribe(this::logEvent, this::logError);
 ```
 
-<b> To Connect and Listen data on a connected socket:</b>
-```
+**To Connect and Listen data on a connected socket:**
+```java
 websocket.connect()
          .flatMapPublisher(open -> open.client().listen())
          .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(
-         	this::logEvent,
-                this::logError
-	  );
+         .subscribe(this::logEvent, this::logError);
 ```
 
 ## License
