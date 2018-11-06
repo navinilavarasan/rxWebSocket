@@ -8,11 +8,11 @@ import com.navin.flintstones.rxwebsocket.WebSocketConverter;
 import java.io.IOException;
 import java.io.StringReader;
 
-public class GsonResponseConvertor<T> implements WebSocketConverter<String, T> {
+public class GsonResponseConverter<T> implements WebSocketConverter<String, T> {
     private final Gson gson;
     private final TypeAdapter<T> adapter;
 
-    GsonResponseConvertor(Gson gson, TypeAdapter<T> adapter) {
+    GsonResponseConverter(Gson gson, TypeAdapter<T> adapter) {
         this.gson = gson;
         this.adapter = adapter;
     }

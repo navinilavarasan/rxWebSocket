@@ -4,13 +4,13 @@ rxWebSocket is a simple reactive extension of OkHttp Websocket interface with su
 
 # Usage
 
-<b> To Create a WebSocket with no convertors: </b>
+<b> To Create a WebSocket with no converters: </b>
 ```
 websocket = new RxWebsocket.Builder()
                 .build("wss://echo.websocket.org");
 ```
 
-<b> To Create a WebSocket with convertors(See sample application to add a simple Gson convertor or write your own):</b>
+<b> To Create a WebSocket with converters(See sample application to add a simple Gson convertor or write your own):</b>
 ```
 websocket = new RxWebsocket.Builder()
                 .addConverterFactory(//YOUR OWN CONVERTOR)

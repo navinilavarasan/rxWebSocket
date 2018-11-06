@@ -13,7 +13,7 @@ public interface WebSocketConverter<F, T> {
     T convert(F value) throws Throwable;
 
     /**
-     * Creates convertor instances based on a type and target usage.
+     * Creates converter instances based on a type and target usage.
      */
     abstract class Factory {
 
