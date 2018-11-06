@@ -26,12 +26,12 @@ public final class WebSocketConverterFactory extends WebSocketConverter.Factory 
     @Override
     public WebSocketConverter<String, ?> responseBodyConverter(Type type) {
         TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
-        return new GsonResponseConvertor(gson, adapter);
+        return new GsonResponseConverter<>(gson, adapter);
     }
 
     @Override
     public WebSocketConverter<?, String> requestBodyConverter(Type type) {
         TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
-        return new GsonRequestConvertor<>(gson, adapter);
+        return new GsonRequestConverter<>(gson, adapter);
     }
 }
