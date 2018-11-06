@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
     private RxWebSocket websocket;
 
     @NonNull
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

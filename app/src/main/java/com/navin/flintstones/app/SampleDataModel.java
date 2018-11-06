@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class SampleDataModel {
     @SerializedName("id")
-    private int id;
+    private final int id;
 
     @SerializedName("message")
     private String message;
