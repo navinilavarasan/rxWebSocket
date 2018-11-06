@@ -19,7 +19,7 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
 
-public class RxWebsocket {
+public class RxWebSocket {
 
     private Request request;
 
@@ -220,7 +220,7 @@ public class RxWebsocket {
     }
 
     public interface Event {
-        RxWebsocket client();
+        RxWebSocket client();
     }
 
     /**
@@ -252,31 +252,31 @@ public class RxWebsocket {
         }
 
         @NonNull
-        public RxWebsocket build() throws IllegalStateException {
+        public RxWebSocket build() throws IllegalStateException {
             if (request == null) {
                 throw new IllegalStateException("Request cannot be null");
             }
 
-            RxWebsocket rxWebsocket = new RxWebsocket();
-            rxWebsocket.request = request;
-            rxWebsocket.converterFactories = converterFactories;
-            rxWebsocket.receiveInterceptors = receiveInterceptors;
-            return rxWebsocket;
+            RxWebSocket rxWebSocket = new RxWebSocket();
+            rxWebSocket.request = request;
+            rxWebSocket.converterFactories = converterFactories;
+            rxWebSocket.receiveInterceptors = receiveInterceptors;
+            return rxWebSocket;
         }
 
         @NonNull
-        public RxWebsocket build(@NonNull String wssUrl) {
+        public RxWebSocket build(@NonNull String wssUrl) {
             if (wssUrl == null || wssUrl.isEmpty()) {
                 throw new IllegalStateException("Websocket address cannot be null or empty");
             }
 
             request = new Request.Builder().url(wssUrl).get().build();
 
-            RxWebsocket rxWebsocket = new RxWebsocket();
-            rxWebsocket.converterFactories = converterFactories;
-            rxWebsocket.receiveInterceptors = receiveInterceptors;
-            rxWebsocket.request = request;
-            return rxWebsocket;
+            RxWebSocket rxWebSocket = new RxWebSocket();
+            rxWebSocket.converterFactories = converterFactories;
+            rxWebSocket.receiveInterceptors = receiveInterceptors;
+            rxWebSocket.request = request;
+            return rxWebSocket;
         }
     }
 
@@ -297,8 +297,8 @@ public class RxWebsocket {
         }
 
         @Override
-        public RxWebsocket client() {
-            return RxWebsocket.this;
+        public RxWebSocket client() {
+            return RxWebSocket.this;
         }
     }
 
@@ -356,8 +356,8 @@ public class RxWebsocket {
         }
 
         @Override
-        public RxWebsocket client() {
-            return RxWebsocket.this;
+        public RxWebSocket client() {
+            return RxWebSocket.this;
         }
     }
 
@@ -375,8 +375,8 @@ public class RxWebsocket {
         }
 
         @Override
-        public RxWebsocket client() {
-            return RxWebsocket.this;
+        public RxWebSocket client() {
+            return RxWebSocket.this;
         }
     }
 
@@ -404,8 +404,8 @@ public class RxWebsocket {
         }
 
         @Override
-        public RxWebsocket client() {
-            return RxWebsocket.this;
+        public RxWebSocket client() {
+            return RxWebSocket.this;
         }
     }
 }

@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.navin.flintstones.rxwebsocket.RxWebsocket;
+import com.navin.flintstones.rxwebsocket.RxWebSocket;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
     @BindView(R.id.recd_message)
     TextView recdMessage;
 
-    private RxWebsocket websocket;
+    private RxWebSocket websocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
     }
 
     private void openWebsocket() {
-        websocket = new RxWebsocket.Builder()
+        websocket = new RxWebSocket.Builder()
                 .addConverterFactory(WebSocketConverterFactory.create())
                 .addReceiveInterceptor(data -> "INTERCEPTED:" + data)
                 .build(location.getText().toString());
@@ -54,23 +54,23 @@ public class MainActivity extends Activity {
         websocket.eventStream()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(event -> {
-                    if (event instanceof RxWebsocket.Open) {
+                    if (event instanceof RxWebSocket.Open) {
                         log("CONNECTED");
                         logNewLine();
-                    } else if (event instanceof RxWebsocket.Closed) {
+                    } else if (event instanceof RxWebSocket.Closed) {
                         log("DISCONNECTED");
                         logNewLine();
-                    } else if (event instanceof RxWebsocket.QueuedMessage) {
-                        log("[MESSAGE QUEUED]:" + ((RxWebsocket.QueuedMessage) event).message().toString());
+                    } else if (event instanceof RxWebSocket.QueuedMessage) {
+                        log("[MESSAGE QUEUED]:" + ((RxWebSocket.QueuedMessage) event).message().toString());
                         logNewLine();
-                    } else if (event instanceof RxWebsocket.Message) {
+                    } else if (event instanceof RxWebSocket.Message) {
                         try {
-                            log("[DE-SERIALIZED MESSAGE RECEIVED]:" + ((RxWebsocket.Message) event).data(SampleDataModel.class).toString());
-                            log(String.format("[DE-SERIALIZED MESSAGE RECEIVED][id]:%d", ((RxWebsocket.Message) event).data(SampleDataModel.class).id()));
-                            log(String.format("[DE-SERIALIZED MESSAGE RECEIVED][message]:%s", ((RxWebsocket.Message) event).data(SampleDataModel.class).message()));
+                            log("[DE-SERIALIZED MESSAGE RECEIVED]:" + ((RxWebSocket.Message) event).data(SampleDataModel.class).toString());
+                            log(String.format("[DE-SERIALIZED MESSAGE RECEIVED][id]:%d", ((RxWebSocket.Message) event).data(SampleDataModel.class).id()));
+                            log(String.format("[DE-SERIALIZED MESSAGE RECEIVED][message]:%s", ((RxWebSocket.Message) event).data(SampleDataModel.class).message()));
                             logNewLine();
                         } catch (Throwable throwable) {
-                            log("[MESSAGE RECEIVED]:" + ((RxWebsocket.Message) event).data().toString());
+                            log("[MESSAGE RECEIVED]:" + ((RxWebSocket.Message) event).data().toString());
                             logNewLine();
                         }
                     }
