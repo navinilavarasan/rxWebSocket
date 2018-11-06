@@ -7,7 +7,7 @@
     android:paddingLeft="12dp"
     android:paddingRight="12dp"
     android:paddingTop="24dp"
-    tools:context="com.navin.flintstones.rxwebsocket_app.MainActivity">
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

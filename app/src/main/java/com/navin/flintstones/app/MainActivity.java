@@ -1,4 +1,4 @@
-package com.navin.flintstones.rxwebsocket_app;
+package com.navin.flintstones.app;
 
 import android.app.Activity;
 import android.os.Bundle;
