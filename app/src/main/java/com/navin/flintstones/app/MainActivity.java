@@ -12,6 +12,7 @@ import com.navin.flintstones.rxwebsocket.RxWebSocket;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,22 +61,27 @@ public class MainActivity extends Activity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(event -> {
                     if (event instanceof RxWebSocket.Open) {
-                        log("CONNECTED");
+                        logWithCurrentTime("CONNECTED");
                         logNewLine();
                     } else if (event instanceof RxWebSocket.Closed) {
-                        log("DISCONNECTED");
+                        logWithCurrentTime("DISCONNECTED");
                         logNewLine();
                     } else if (event instanceof RxWebSocket.QueuedMessage) {
-                        log("[MESSAGE QUEUED]:" + ((RxWebSocket.QueuedMessage) event).message().toString());
+                        Object message = ((RxWebSocket.QueuedMessage) event).message();
+                        if (message == null) {
+                            return;
+                        }
+
+                        logWithCurrentTime("[MESSAGE QUEUED]:" + message.toString());
                         logNewLine();
                     } else if (event instanceof RxWebSocket.Message) {
                         try {
-                            log("[DE-SERIALIZED MESSAGE RECEIVED]:" + ((RxWebSocket.Message) event).data(SampleDataModel.class).toString());
-                            log(String.format("[DE-SERIALIZED MESSAGE RECEIVED][id]:%d", ((RxWebSocket.Message) event).data(SampleDataModel.class).id()));
-                            log(String.format("[DE-SERIALIZED MESSAGE RECEIVED][message]:%s", ((RxWebSocket.Message) event).data(SampleDataModel.class).message()));
+                            logWithCurrentTime("[DE-SERIALIZED MESSAGE RECEIVED]:" + ((RxWebSocket.Message) event).data(SampleDataModel.class).toString());
+                            logWithCurrentTime(String.format(Locale.US, "[DE-SERIALIZED MESSAGE RECEIVED][id]:%d", ((RxWebSocket.Message) event).data(SampleDataModel.class).id()));
+                            logWithCurrentTime(String.format("[DE-SERIALIZED MESSAGE RECEIVED][message]:%s", ((RxWebSocket.Message) event).data(SampleDataModel.class).message()));
                             logNewLine();
                         } catch (Throwable throwable) {
-                            log("[MESSAGE RECEIVED]:" + ((RxWebSocket.Message) event).data().toString());
+                            logWithCurrentTime("[MESSAGE RECEIVED]:" + ((RxWebSocket.Message) event).data());
                             logNewLine();
                         }
                     }
@@ -85,21 +91,27 @@ public class MainActivity extends Activity {
     }
 
     private void logNewLine() {
-        recdMessage.setText(recdMessage.getText() + "\n");
+        log("\n");
+    }
+
+    private void log(String s) {
+        StringBuilder stringBuilder = new StringBuilder(recdMessage.getText());
+        stringBuilder.append(s);
+        recdMessage.setText(stringBuilder);
     }
 
 
     private void logError(Throwable throwable) {
-        recdMessage.setText(recdMessage.getText() + String.format("\n[%s]:[ERROR]%s", getCurrentTime(), throwable.getMessage()));
+        log(String.format("\n[%s]:[ERROR]%s", getCurrentTime(), throwable.getMessage()));
     }
 
-    private void log(String text) {
-        recdMessage.setText(recdMessage.getText() + String.format("\n[%s]:%s", getCurrentTime(), text));
+    private void logWithCurrentTime(String text) {
+        log(String.format("\n[%s]:%s", getCurrentTime(), text));
     }
 
     private String getCurrentTime() {
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);
         return sdf.format(c.getTime());
     }
 
