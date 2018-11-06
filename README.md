@@ -21,7 +21,7 @@ dependencies {
     implementation 'io.github.meness:rxWebSocket:x.y.z'
 }
 ```
-**Note:** Replace `x.y.z` with the latest version which can be found at [releases page](https://github.com/meNESS/EasyIntro/releases).
+**Note:** Replace `x.y.z` with the latest version which can be found at [releases page](https://github.com/meness/rxWebSocket/releases).
 
 ## Usage
 **To Create a WebSocket with no converters:**
