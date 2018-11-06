@@ -22,19 +22,15 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends Activity {
 
-    @BindView(R.id.location)
-    EditText location;
-
-    @BindView(R.id.send_message)
-    EditText sendMessage;
-
-    @BindView(R.id.recd_message)
-    TextView recdMessage;
-
-    private RxWebSocket websocket;
-
     @NonNull
     private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    @BindView(R.id.location)
+    EditText location;
+    @BindView(R.id.send_message)
+    EditText sendMessage;
+    @BindView(R.id.recd_message)
+    TextView recdMessage;
+    private RxWebSocket websocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
