@@ -19,11 +19,8 @@ public class GsonResponseConverter<T> implements WebSocketConverter<String, T> {
 
     @Override
     public T convert(String value) throws IOException {
-        JsonReader jsonReader = gson.newJsonReader(new StringReader(value));
-        try {
+        try (JsonReader jsonReader = gson.newJsonReader(new StringReader(value))) {
             return adapter.read(jsonReader);
-        } finally {
-            jsonReader.close();
         }
     }
 }

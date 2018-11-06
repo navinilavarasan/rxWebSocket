@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.navin.flintstones.rxwebsocket.WebSocketConverter;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 public class GsonRequestConverter<T> implements WebSocketConverter<T, String> {
@@ -19,7 +18,7 @@ public class GsonRequestConverter<T> implements WebSocketConverter<T, String> {
     }
 
     @Override
-    public String convert(T value) throws IOException {
+    public String convert(T value) {
         return adapter.toJson(value);
     }
 }
