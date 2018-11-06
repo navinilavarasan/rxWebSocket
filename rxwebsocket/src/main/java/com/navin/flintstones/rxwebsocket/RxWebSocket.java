@@ -107,7 +107,7 @@ public class RxWebSocket {
         requireNotNull(message, "Expected a non null message");
         if (originalWebsocket.send(ByteString.of(message))) {
             if (eventStream.hasSubscribers()) {
-                eventStream.onNext(new QueuedMessage(ByteString.of(message)));
+                eventStream.onNext(new QueuedMessage<>(ByteString.of(message)));
             }
         }
     }
@@ -121,7 +121,7 @@ public class RxWebSocket {
             try {
                 if (originalWebsocket.send(converter.convert(message))) {
                     if (eventStream.hasSubscribers()) {
-                        eventStream.onNext(new QueuedMessage(message));
+                        eventStream.onNext(new QueuedMessage<>(message));
                     }
                 }
             } catch (Throwable throwable) {
