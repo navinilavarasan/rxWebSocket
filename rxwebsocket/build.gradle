@@ -5,7 +5,7 @@ group = 'com.github.navinilavarasan'
 version = '1.01'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
