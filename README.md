@@ -1,5 +1,8 @@
-rxWebSocket [![](https://img.shields.io/badge/Android%20Arsenal-rxWebsocket-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/6630) [![Codacy Badge](https://api.codacy.com/project/badge/grade/e93c6273804a4dbc91a298a66fed99be)](https://www.codacy.com/app/aesshoferi/EasyIntro)
+rxWebSocket
 ===========
+[![](https://img.shields.io/badge/Android%20Arsenal-rxWebsocket-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/6630)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d9098cd1f39c422e8150b36ca084d45f)](https://www.codacy.com/app/meness/rxWebSocket?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=meness/rxWebSocket&amp;utm_campaign=Badge_Grade)
+
 rxWebSocket is a simple reactive extension of OkHttp Websocket interface with support for Converter Factories and Interceptors.
 
 ## Download
