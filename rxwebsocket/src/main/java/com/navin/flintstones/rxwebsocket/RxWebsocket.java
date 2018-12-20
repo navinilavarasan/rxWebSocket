@@ -31,6 +31,8 @@ public class RxWebsocket {
 
     private boolean userRequestedClose = false;
 
+    private OkHttpClient okHttpClient;
+
     public interface Event {
         RxWebsocket client();
     }
@@ -216,8 +218,9 @@ public class RxWebsocket {
             }
             return;
         }
-
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
+        if (okHttpClient == null) {
+            okHttpClient = new OkHttpClient.Builder().build();
+        }
         okHttpClient.newWebSocket(request, webSocketListener());
     }
 
@@ -361,6 +364,7 @@ public class RxWebsocket {
         private List<WebSocketConverter.Factory> converterFactories = new ArrayList<>();
         private List<WebSocketInterceptor> receiveInterceptors = new ArrayList<>();
         private Request request;
+        private OkHttpClient okHttpClient;
 
         @NonNull
         public Builder request(Request request) {
@@ -382,6 +386,11 @@ public class RxWebsocket {
             return this;
         }
 
+        public Builder addOkHttpClient(OkHttpClient okHttpClient) {
+            this.okHttpClient = okHttpClient;
+            return this;
+        }
+
         @NonNull
         public RxWebsocket build() throws IllegalStateException {
             if (request == null) {
@@ -392,6 +401,7 @@ public class RxWebsocket {
             rxWebsocket.request = request;
             rxWebsocket.converterFactories = converterFactories;
             rxWebsocket.receiveInterceptors = receiveInterceptors;
+            rxWebsocket.okHttpClient = okHttpClient;
             return rxWebsocket;
         }
 
@@ -407,6 +417,7 @@ public class RxWebsocket {
             rxWebsocket.converterFactories = converterFactories;
             rxWebsocket.receiveInterceptors = receiveInterceptors;
             rxWebsocket.request = request;
+            rxWebsocket.okHttpClient = okHttpClient;
             return rxWebsocket;
         }
     }
