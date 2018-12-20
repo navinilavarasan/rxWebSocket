@@ -3,6 +3,7 @@ package com.navin.flintstones.rxwebsocket_app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,6 +17,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 public class MainActivity extends Activity {
 
@@ -43,9 +46,21 @@ public class MainActivity extends Activity {
     }
 
     private void openWebsocket() {
-        websocket = new RxWebsocket.Builder()
+        OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
+
+        okHttpClientBuilder.addInterceptor(chain -> {
+            Request original = chain.request();
+            Request.Builder requestBuilder = original.newBuilder();
+            requestBuilder.addHeader("Authorization", "Bearer ")
+                    .build();
+
+            return chain.proceed(requestBuilder.build());
+        });
+
+            websocket = new RxWebsocket.Builder()
                 .addConverterFactory(WebSocketConverterFactory.create())
                 .addReceiveInterceptor(data -> "INTERCEPTED:" + data)
+                .addOkHttpClient(okHttpClientBuilder.build())
                 .build(location.getText().toString());
         logEvents();
     }
