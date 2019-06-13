@@ -10,6 +10,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.processors.BehaviorProcessor;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
@@ -23,8 +24,8 @@ public class RxWebsocket {
 
     private Request request;
 
-    private List<WebSocketConverter.Factory> converterFactories = new ArrayList<>();
-    private List<WebSocketInterceptor> receiveInterceptors = new ArrayList<>();
+    private List<WebSocketConverter.Factory> converterFactories  = new ArrayList<>();
+    private List<WebSocketInterceptor>       receiveInterceptors = new ArrayList<>();
 
     @Nullable
     private WebSocket originalWebsocket;
@@ -60,7 +61,7 @@ public class RxWebsocket {
     }
 
     public class Message implements Event {
-        private final String message;
+        private final String     message;
         private final ByteString messageBytes;
 
         public Message(String message) {
@@ -139,9 +140,9 @@ public class RxWebsocket {
 
 
     public class Closed extends Throwable implements Event {
-        public static final int INTERNAL_ERROR = 500;
-        private final String reason;
-        private final int code;
+        public static final int    INTERNAL_ERROR = 500;
+        private final       String reason;
+        private final       int    code;
 
         public Closed(int code, String reason) {
             this.code = code;
@@ -171,40 +172,40 @@ public class RxWebsocket {
 
     public Single<Open> connect() {
         return eventStream()
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe(d -> doConnect())
-                .ofType(Open.class)
-                .firstOrError();
+            .subscribeOn(Schedulers.io())
+            .doOnSubscribe(d -> doConnect())
+            .ofType(Open.class)
+            .firstOrError();
     }
 
     public Flowable<Message> listen() {
         return eventStream()
-                .subscribeOn(Schedulers.io())
-                .ofType(Message.class);
+            .subscribeOn(Schedulers.io())
+            .ofType(Message.class);
     }
 
     public Single<QueuedMessage> send(byte[] message) {
         return eventStream()
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe(d -> doQueueMessage(message))
-                .ofType(QueuedMessage.class)
-                .firstOrError();
+            .subscribeOn(Schedulers.io())
+            .doOnSubscribe(d -> doQueueMessage(message))
+            .ofType(QueuedMessage.class)
+            .firstOrError();
     }
 
     public <T> Single<QueuedMessage> send(final T message) {
         return eventStream()
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe(d -> doQueueMessage(message))
-                .ofType(QueuedMessage.class)
-                .firstOrError();
+            .subscribeOn(Schedulers.io())
+            .doOnSubscribe(d -> doQueueMessage(message))
+            .ofType(QueuedMessage.class)
+            .firstOrError();
     }
 
     public Single<Closed> disconnect(int code, String reason) {
         return eventStream()
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe(d -> doDisconnect(code, reason))
-                .ofType(Closed.class)
-                .firstOrError();
+            .subscribeOn(Schedulers.io())
+            .doOnSubscribe(d -> doDisconnect(code, reason))
+            .ofType(Closed.class)
+            .firstOrError();
     }
 
     public Flowable<Event> eventStream() {
@@ -331,7 +332,7 @@ public class RxWebsocket {
     private <T> WebSocketConverter<String, T> responseConverter(final Type type) {
         for (WebSocketConverter.Factory converterFactory : converterFactories) {
             WebSocketConverter<String, ?> converter =
-                    converterFactory.responseBodyConverter(type);
+                converterFactory.responseBodyConverter(type);
             if (converter != null) {
                 return (WebSocketConverter<String, T>) converter;
             }
@@ -342,7 +343,7 @@ public class RxWebsocket {
     private <T> WebSocketConverter<T, String> requestConverter(final Type type) {
         for (WebSocketConverter.Factory converterFactory : converterFactories) {
             WebSocketConverter<?, String> converter =
-                    converterFactory.requestBodyConverter(type);
+                converterFactory.requestBodyConverter(type);
             if (converter != null) {
                 return (WebSocketConverter<T, String>) converter;
             }
@@ -361,16 +362,8 @@ public class RxWebsocket {
      * Builder class for creating rx websockets.
      */
     public static class Builder {
-        private List<WebSocketConverter.Factory> converterFactories = new ArrayList<>();
-        private List<WebSocketInterceptor> receiveInterceptors = new ArrayList<>();
-        private Request request;
-        private OkHttpClient okHttpClient;
-
-        @NonNull
-        public Builder request(Request request) {
-            this.request = request;
-            return this;
-        }
+        private List<WebSocketConverter.Factory> converterFactories  = new ArrayList<>();
+        private List<WebSocketInterceptor>       receiveInterceptors = new ArrayList<>();
 
         @NonNull
         public Builder addConverterFactory(WebSocketConverter.Factory factory) {
@@ -386,13 +379,8 @@ public class RxWebsocket {
             return this;
         }
 
-        public Builder addOkHttpClient(OkHttpClient okHttpClient) {
-            this.okHttpClient = okHttpClient;
-            return this;
-        }
-
         @NonNull
-        public RxWebsocket build() throws IllegalStateException {
+        public RxWebsocket build(@NonNull OkHttpClient okHttpClient, @NonNull Request request) {
             if (request == null) {
                 throw new IllegalStateException("Request cannot be null");
             }
@@ -406,17 +394,15 @@ public class RxWebsocket {
         }
 
         @NonNull
-        public RxWebsocket build(@NonNull String wssUrl) {
+        public RxWebsocket build(@NonNull OkHttpClient okHttpClient, @NonNull String wssUrl) {
             if (wssUrl == null || wssUrl.isEmpty()) {
                 throw new IllegalStateException("Websocket address cannot be null or empty");
             }
 
-            request = new Request.Builder().url(wssUrl).get().build();
-
             RxWebsocket rxWebsocket = new RxWebsocket();
             rxWebsocket.converterFactories = converterFactories;
             rxWebsocket.receiveInterceptors = receiveInterceptors;
-            rxWebsocket.request = request;
+            rxWebsocket.request = new Request.Builder().url(wssUrl).get().build();
             rxWebsocket.okHttpClient = okHttpClient;
             return rxWebsocket;
         }

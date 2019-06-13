@@ -14,8 +14,8 @@ websocket = new RxWebsocket.Builder()
 ```
 websocket = new RxWebsocket.Builder()
                 .addConverterFactory(//YOUR OWN CONVERTOR)
-		.addReceiveInterceptor(data -> //Intercept the received data)
-                .build("wss://echo.websocket.org");
+		        .addReceiveInterceptor(data -> //Intercept the received data)
+                .build(okHttpClient, "wss://echo.websocket.org");
 ```
 		
 <b> To Connect to the websocket:</b>
